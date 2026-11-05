@@ -14,7 +14,7 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 
 ## API
 
-8. **Refresh token opaco + rotação com detecção de reuso.** O refresh token é um valor aleatório guardado no banco apenas como HMAC-SHA256. A cada uso ele é revogado e substituído; se um token já revogado for reapresentado, toda a "família" (sessão) é encerrada. Ele trafega só em cookie `httpOnly` (`SameSite=Lax`, `Path=/api/auth`); o access token (JWT de 15 min) fica apenas em memória na web. Para não derrubar a sessão quando duas abas renovam ao mesmo tempo, reapresentar um token que acabou de ser *rotacionado* (até 10 s) gera um novo par em vez de ser tratado como roubo — desde que a sessão continue ativa (logout e troca de senha encerram a família de vez).
+8. **Refresh token opaco + rotação com detecção de reuso.** O refresh token é um valor aleatório guardado no banco apenas como HMAC-SHA256. A cada uso ele é revogado e substituído; se um token já revogado for reapresentado, toda a "família" (sessão) é encerrada. Ele trafega só em cookie `httpOnly` (`SameSite=Lax`, `Path=/api/auth`); o access token (JWT de 15 min) fica apenas em memória na web. Para não derrubar a sessão quando duas abas renovam ao mesmo tempo, reapresentar um token que acabou de ser _rotacionado_ (até 10 s) gera um novo par em vez de ser tratado como roubo — desde que a sessão continue ativa (logout e troca de senha encerram a família de vez).
 9. **404 em vez de 403 para quem não é membro.** Recursos de workspaces dos quais o usuário não participa respondem 404, para não revelar que existem. Membros sem permissão para a ação recebem 403.
 10. **Posições em ponto flutuante.** Mover um cartão/coluna atualiza só uma linha (ponto médio entre vizinhos). Quando não há mais espaço, a lista é renumerada e o evento `cards.reordered` é enviado.
 11. **Coluna "concluída" (`isDone`).** Em vez de um status separado, cada quadro marca quais colunas significam "feito". Entrar nelas preenche `completedAt` (usado no dashboard); sair limpa.
@@ -30,3 +30,12 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 18. **Barramento de eventos desacoplado.** Os services publicam em `realtimeBus` sem conhecer o Socket.io; o módulo de tempo real se inscreve ao subir o servidor. Isso deixa os services testáveis sem socket e permite trocar o transporte no futuro (ex.: Redis adapter para várias instâncias).
 19. **Sem eco para quem originou a ação.** A web envia o id do socket no cabeçalho `x-socket-id`; o evento vai para a sala `board:<id>` exceto esse socket, porque a interface dele já foi atualizada de forma otimista.
 20. **Autenticação no handshake** com o access token. Ao entrar em um quadro, a permissão é conferida; quando os membros mudam, a sala é revalidada e quem perdeu acesso é removido. Uma conexão já aberta continua válida após o token expirar (a web reconecta com um token novo ao renovar a sessão).
+
+## Web
+
+21. **Rotas com parâmetros de busca** (`/board?id=...&card=...`) em vez de segmentos dinâmicos (`/board/[id]`). O modo demonstração é um site estático no GitHub Pages, que não consegue gerar páginas para ids desconhecidos; com query string, a mesma build funciona no Docker e no Pages. O cartão aberto também fica na URL, então dá para compartilhar o link de um cartão.
+22. **Renderização no cliente.** Todos os dados vêm da API autenticada por token em memória, então as páginas são componentes de cliente com TanStack Query (cache, revalidação e atualização otimista). O Next continua cuidando de rotas, build, otimização e do modo estático.
+23. **Arrastar e soltar desativado com filtros ativos.** Com parte dos cartões escondida, o índice de destino ficaria ambíguo; o quadro avisa e reativa ao limpar os filtros. Para teclado e leitores de tela, o dnd-kit usa Espaço/setas com anúncios em português, e o modal do cartão tem um seletor "Coluna" como alternativa ao arraste.
+24. **Fontes empacotadas (`@fontsource-variable`)** em vez de `next/font/google`: o build não depende de acesso ao Google Fonts e funciona igual no GitHub Pages com `basePath`.
+25. **Ícones SVG próprios** (um único componente com os caminhos), para não adicionar uma biblioteca inteira de ícones.
+26. **Markdown seguro**: `react-markdown` sem `rehype-raw` (HTML do usuário nunca é interpretado), links externos com `rel="noopener noreferrer nofollow"`.
