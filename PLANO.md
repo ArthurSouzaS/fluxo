@@ -12,5 +12,5 @@ Gerenciador de projetos colaborativo em tempo real (estilo Trello/Jira).
 - [x] **Fase 8** — Visual e UX: temas escuro/claro, responsivo, acessível, estados de carregamento/vazio/erro, atalhos de teclado
 - [x] **Fase 9** — Testes: unitários (Vitest), integração (Supertest), componentes e E2E (Playwright)
 - [x] **Fase 10** — Modo demonstração: build estático no GitHub Pages com MSW
-- [ ] **Fase 11** — Documentação (README completo)
+- [x] **Fase 11** — Documentação (README completo)
 - [ ] **Fase 12** — Revisão final (bugs, duplicação, segurança e performance)
