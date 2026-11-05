@@ -39,4 +39,9 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 24. **Fontes empacotadas (`@fontsource-variable`)** em vez de `next/font/google`: o build não depende de acesso ao Google Fonts e funciona igual no GitHub Pages com `basePath`.
 25. **Ícones SVG próprios** (um único componente com os caminhos), para não adicionar uma biblioteca inteira de ícones.
 26. **Markdown seguro**: `react-markdown` sem `rehype-raw` (HTML do usuário nunca é interpretado), links externos com `rel="noopener noreferrer nofollow"`.
-27. **Gráficos sem biblioteca.** Barras e colunas são SVG desenhados em pixels reais (largura medida com `ResizeObserver`), com dica ao passar o mouse/focar, alternância para tabela (alternativa acessível) e legenda sempre que há mais de uma série. As cores de série (`--chart-*`) foram validadas para daltonismo e contraste nos dois temas; texto nunca usa a cor da série. "Atrasados" é uma tabela, não um gráfico: o que importa ali é saber *quais* cartões.
+27. **Gráficos sem biblioteca.** Barras e colunas são SVG desenhados em pixels reais (largura medida com `ResizeObserver`), com dica ao passar o mouse/focar, alternância para tabela (alternativa acessível) e legenda sempre que há mais de uma série. As cores de série (`--chart-*`) foram validadas para daltonismo e contraste nos dois temas; texto nunca usa a cor da série. "Atrasados" é uma tabela, não um gráfico: o que importa ali é saber _quais_ cartões.
+
+## Testes
+
+28. **Pirâmide de testes**: unitários com Vitest (regras de permissão, ordenação, menções, estatísticas, tokens, services com Prisma simulado e funções de estado da web); integração com Supertest contra um PostgreSQL real (todas as rotas, incluindo erros 400/401/403/404/409/413/429 e o Socket.io); componentes com Testing Library; E2E com Playwright subindo banco, API e web.
+29. **Banco dos testes isolado e com trava**: os testes de integração só rodam em bancos cujo nome contém `test` (eles apagam as tabelas); o E2E usa o banco `fluxo_e2e` e portas próprias (3334/3101), recriando os dados com o seed a cada execução (`prisma migrate deploy` + seed, sem `migrate reset`).

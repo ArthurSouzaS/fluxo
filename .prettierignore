@@ -9,3 +9,5 @@ uploads
 apps/web/public/mockServiceWorker.js
 package-lock.json
 apps/api/prisma/migrations/**/*.sql
+.next-e2e
+uploads-e2e

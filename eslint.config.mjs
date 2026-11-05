@@ -14,6 +14,8 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/dist/**',
       '**/.next/**',
+      '**/.next-e2e/**',
+      '**/uploads*/**',
       '**/out/**',
       '**/coverage/**',
       '**/playwright-report/**',
