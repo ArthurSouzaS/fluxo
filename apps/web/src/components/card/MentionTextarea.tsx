@@ -1,6 +1,14 @@
 'use client';
 
-import { forwardRef, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useId,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { Member } from '@fluxo/shared';
 import { Avatar } from '../ui/Avatar';
 import styles from './MentionTextarea.module.scss';
@@ -33,6 +41,14 @@ export const MentionTextarea = forwardRef<HTMLTextAreaElement, MentionTextareaPr
     const listId = useId();
     const [mention, setMention] = useState<{ query: string; start: number } | null>(null);
     const [active, setActive] = useState(0);
+    /** Posição do cursor a aplicar assim que o novo texto for renderizado. */
+    const pendingCaret = useRef<number | null>(null);
+
+    useLayoutEffect(() => {
+      if (pendingCaret.current === null || !ref.current) return;
+      ref.current.setSelectionRange(pendingCaret.current, pendingCaret.current);
+      pendingCaret.current = null;
+    }, [value]);
 
     const suggestions = useMemo(() => {
       if (!mention) return [];
@@ -56,11 +72,8 @@ export const MentionTextarea = forwardRef<HTMLTextAreaElement, MentionTextareaPr
       const next = `${value.slice(0, mention.start)}@${member.user.username} ${value.slice(caret)}`;
       onChange(next);
       setMention(null);
-      const position = mention.start + member.user.username.length + 2;
-      requestAnimationFrame(() => {
-        ref.current?.focus();
-        ref.current?.setSelectionRange(position, position);
-      });
+      pendingCaret.current = mention.start + member.user.username.length + 2;
+      ref.current.focus();
     };
 
     const open = suggestions.length > 0;

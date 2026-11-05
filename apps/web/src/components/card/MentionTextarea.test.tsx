@@ -51,6 +51,9 @@ describe('MentionTextarea', () => {
     await userEvent.keyboard('{ArrowDown}{Enter}');
     expect(textarea).toHaveValue('Oi @bernardo ');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    // Continua digitando no lugar certo depois da menção.
+    await userEvent.keyboard('tudo certo?');
+    expect(textarea).toHaveValue('Oi @bernardo tudo certo?');
   });
 
   it('Ctrl+Enter envia', async () => {
