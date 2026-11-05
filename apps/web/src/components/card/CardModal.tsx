@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { can, type BoardDetail } from '@fluxo/shared';
@@ -33,7 +34,14 @@ export function CardModal({ cardId, board, onClose }: CardModalProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const canEdit = can(board.myRole, 'card:write');
 
+  const router = useRouter();
   const card = useQuery({ queryKey: queryKeys.card(cardId), queryFn: () => cardsApi.get(cardId) });
+
+  // Link de um cartão de outro quadro: abre no quadro certo.
+  const otherBoardId = card.data && card.data.boardId !== board.id ? card.data.boardId : null;
+  useEffect(() => {
+    if (otherBoardId) router.replace(`/board?id=${otherBoardId}&card=${cardId}`);
+  }, [otherBoardId, cardId, router]);
   const [title, setTitle] = useState('');
   useEffect(() => {
     if (card.data) setTitle(card.data.title);
