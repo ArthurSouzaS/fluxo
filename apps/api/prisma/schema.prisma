@@ -1,5 +1,10 @@
+// Modelo de dados do Fluxo.
+// Convenções: ids em cuid, nomes de tabelas no plural e em snake_case (@@map),
+// posições de colunas/cartões em ponto flutuante para reordenação barata.
+
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -7,7 +12,307 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// Papéis de um membro dentro de um workspace.
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  OBSERVER
+}
+
+enum NotificationType {
+  MENTION
+  ASSIGNED
+  COMMENT
+  MEMBER_ADDED
+}
+
 model User {
-  id    String @id @default(cuid())
-  email String @unique
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  /// Apelido único usado nas menções (@apelido).
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  avatarColor  String   @default("#34d399") @map("avatar_color")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  refreshTokens      RefreshToken[]
+  memberships        WorkspaceMember[]
+  boardsCreated      Board[]           @relation("BoardCreator")
+  cardsCreated       Card[]            @relation("CardCreator")
+  assignments        CardAssignee[]
+  comments           Comment[]
+  attachments        Attachment[]
+  activities         Activity[]
+  notifications      Notification[]    @relation("NotificationRecipient")
+  notificationsActed Notification[]    @relation("NotificationActor")
+
+  @@map("users")
+}
+
+/// Refresh tokens são guardados apenas como hash (SHA-256) e rotacionados a cada uso.
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  /// Tokens da mesma "família" (mesmo login) — reutilização de um token revogado derruba a família.
+  family    String
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([family])
+  @@map("refresh_tokens")
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members    WorkspaceMember[]
+  boards     Board[]
+  activities Activity[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  role        Role     @default(MEMBER)
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  workspaceId String   @map("workspace_id")
+  title       String
+  description String?
+  /// Cor de destaque do quadro (hex).
+  color       String   @default("#38bdf8")
+  archived    Boolean  @default(false)
+  createdById String?  @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  workspace  Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy  User?         @relation("BoardCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  columns    BoardColumn[]
+  cards      Card[]
+  labels     Label[]
+  activities Activity[]
+
+  @@index([workspaceId])
+  @@map("boards")
+}
+
+model BoardColumn {
+  id        String   @id @default(cuid())
+  boardId   String   @map("board_id")
+  title     String
+  position  Float
+  /// Limite de cartões em andamento (WIP). Nulo = sem limite.
+  wipLimit  Int?     @map("wip_limit")
+  /// Cartões nesta coluna contam como concluídos no dashboard.
+  isDone    Boolean  @default(false) @map("is_done")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards Card[]
+
+  @@index([boardId, position])
+  @@map("board_columns")
+}
+
+model Card {
+  id          String    @id @default(cuid())
+  boardId     String    @map("board_id")
+  columnId    String    @map("column_id")
+  title       String
+  /// Descrição em Markdown.
+  description String    @default("")
+  position    Float
+  dueDate     DateTime? @map("due_date")
+  /// Preenchido quando o cartão entra em uma coluna marcada como concluída.
+  completedAt DateTime? @map("completed_at")
+  archived    Boolean   @default(false)
+  createdById String?   @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  board       Board          @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  column      BoardColumn    @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  createdBy   User?          @relation("CardCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  assignees   CardAssignee[]
+  labels      CardLabel[]
+  checklists  Checklist[]
+  comments    Comment[]
+  attachments Attachment[]
+  activities  Activity[]
+
+  @@index([columnId, position])
+  @@index([boardId])
+  @@index([dueDate])
+  @@map("cards")
+}
+
+model CardAssignee {
+  cardId     String   @map("card_id")
+  userId     String   @map("user_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, userId])
+  @@index([userId])
+  @@map("card_assignees")
+}
+
+model Label {
+  id        String   @id @default(cuid())
+  boardId   String   @map("board_id")
+  name      String
+  color     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  board Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards CardLabel[]
+
+  @@index([boardId])
+  @@map("labels")
+}
+
+model CardLabel {
+  cardId  String @map("card_id")
+  labelId String @map("label_id")
+
+  card  Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, labelId])
+  @@index([labelId])
+  @@map("card_labels")
+}
+
+model Checklist {
+  id        String   @id @default(cuid())
+  cardId    String   @map("card_id")
+  title     String
+  position  Float
+  createdAt DateTime @default(now()) @map("created_at")
+
+  card  Card            @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  items ChecklistItem[]
+
+  @@index([cardId])
+  @@map("checklists")
+}
+
+model ChecklistItem {
+  id          String   @id @default(cuid())
+  checklistId String   @map("checklist_id")
+  text        String
+  done        Boolean  @default(false)
+  position    Float
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+  @@map("checklist_items")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  cardId    String   @map("card_id")
+  authorId  String   @map("author_id")
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  card   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([cardId, createdAt])
+  @@map("comments")
+}
+
+model Attachment {
+  id         String   @id @default(cuid())
+  cardId     String   @map("card_id")
+  uploaderId String?  @map("uploader_id")
+  /// Nome original enviado pelo usuário (apenas exibição).
+  fileName   String   @map("file_name")
+  /// Nome gerado no disco — nunca derivado da entrada do usuário.
+  storedName String   @unique @map("stored_name")
+  mimeType   String   @map("mime_type")
+  size       Int
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  card     Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  uploader User? @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([cardId])
+  @@map("attachments")
+}
+
+/// Histórico de ações (log de atividades).
+model Activity {
+  id          String   @id @default(cuid())
+  workspaceId String   @map("workspace_id")
+  boardId     String?  @map("board_id")
+  cardId      String?  @map("card_id")
+  actorId     String?  @map("actor_id")
+  /// Tipo da ação, ex.: card.created, card.moved, comment.created.
+  type        String
+  /// Dados extras para montar a mensagem (títulos, colunas de origem/destino...).
+  data        Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  board     Board?    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  card      Card?     @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  actor     User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([boardId, createdAt])
+  @@index([cardId, createdAt])
+  @@index([workspaceId, createdAt])
+  @@map("activities")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  actorId   String?          @map("actor_id")
+  type      NotificationType
+  message   String
+  /// Referências para navegação: workspaceId, boardId, cardId, commentId.
+  data      Json             @default("{}")
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user  User  @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
 }
