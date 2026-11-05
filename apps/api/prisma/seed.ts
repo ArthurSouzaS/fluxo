@@ -211,6 +211,7 @@ async function main() {
                 authorId: userId(cm.author),
                 body: cm.body,
                 createdAt: commentAt,
+                updatedAt: commentAt,
               },
             });
             activities.push({

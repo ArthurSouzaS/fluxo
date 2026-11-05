@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   trailingSlash: isDemo,
   images: { unoptimized: true },
   reactStrictMode: true,
+  devIndicators: false,
   poweredByHeader: false,
   transpilePackages: ['@fluxo/shared'],
   // O lint roda na raiz do monorepo (pnpm lint), não durante o build.

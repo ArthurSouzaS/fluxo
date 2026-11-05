@@ -121,7 +121,10 @@ export function CardComments({ cardId, board }: { cardId: string; board: BoardDe
                     <time dateTime={comment.createdAt} title={formatFullDate(comment.createdAt)}>
                       {formatRelative(comment.createdAt)}
                     </time>
-                    {comment.updatedAt !== comment.createdAt ? <span>(editado)</span> : null}
+                    {new Date(comment.updatedAt).getTime() - new Date(comment.createdAt).getTime() >
+                    2000 ? (
+                      <span>(editado)</span>
+                    ) : null}
                   </p>
                   {editing?.id === comment.id ? (
                     <>
