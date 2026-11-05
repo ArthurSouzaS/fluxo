@@ -61,6 +61,7 @@ export default tseslint.config(
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs['core-web-vitals'].rules,
       'react/prop-types': 'off',
+      'jsx-a11y/label-has-associated-control': ['error', { depth: 3 }],
       '@next/next/no-img-element': 'off',
       '@next/next/no-html-link-for-pages': 'off',
     },
