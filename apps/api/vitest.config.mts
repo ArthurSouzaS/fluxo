@@ -8,6 +8,7 @@ export default defineConfig({
           name: 'unit',
           include: ['src/**/*.test.ts'],
           environment: 'node',
+          setupFiles: ['src/test-setup.ts'],
         },
       },
       {
