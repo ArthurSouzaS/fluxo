@@ -1,0 +1,111 @@
+@use '../../styles/mixins' as *;
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--board) 10%, transparent),
+    transparent 50%
+  );
+
+  @include down($bp-sm) {
+    padding: 12px;
+  }
+}
+
+.titleBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.swatch {
+  flex-shrink: 0;
+  width: 10px;
+  height: 36px;
+  border-radius: 4px;
+  background: var(--board);
+}
+
+.titles {
+  min-width: 0;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  @include truncate;
+}
+
+.subtitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+
+  a {
+    color: var(--text-muted);
+  }
+}
+
+.readOnly {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.online {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 6px;
+}
+
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 0 rgb(52 211 153 / 0.6);
+  animation: pulse 2s infinite;
+}
+
+.archived {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--amber) 14%, transparent);
+  color: var(--amber-text);
+}
+
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 8px rgb(52 211 153 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(52 211 153 / 0);
+  }
+}

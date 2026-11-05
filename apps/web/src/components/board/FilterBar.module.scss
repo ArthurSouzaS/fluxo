@@ -1,0 +1,110 @@
+@use '../../styles/mixins' as *;
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+
+  @include down($bp-sm) {
+    padding: 10px 12px;
+  }
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-subtle);
+
+  &:focus-within {
+    border-color: var(--focus);
+  }
+
+  input {
+    width: 180px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.select {
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+
+  &[aria-pressed='true'] {
+    border-color: var(--label);
+    background: color-mix(in srgb, var(--label) 18%, transparent);
+    color: var(--text);
+  }
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--label);
+}
+
+.person {
+  display: inline-flex;
+  padding: 2px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  opacity: 0.6;
+
+  &[aria-pressed='true'] {
+    border-color: var(--primary);
+    opacity: 1;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 13px;
+}
