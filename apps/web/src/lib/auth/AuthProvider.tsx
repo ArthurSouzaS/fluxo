@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { LoginInput, RegisterInput, UserProfile } from '@fluxo/shared';
-import { onSessionChange, refreshSession, setSession } from '../api/client';
+import { hasSessionHint, onSessionChange, refreshSession, setSession } from '../api/client';
 import { authApi } from '../api/endpoints';
 
 type Status = 'loading' | 'authenticated' | 'anonymous';
@@ -37,10 +37,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       setStatus(session ? 'authenticated' : 'anonymous');
     });
-    // Restaura a sessão a partir do cookie de refresh.
-    void refreshSession().then((session) => {
-      if (!session) setStatus('anonymous');
-    });
+    // Restaura a sessão a partir do cookie de refresh (se houve login neste navegador).
+    if (!hasSessionHint()) {
+      setStatus('anonymous');
+    } else {
+      void refreshSession().then((session) => {
+        if (!session) setStatus('anonymous');
+      });
+    }
     return off;
   }, []);
 

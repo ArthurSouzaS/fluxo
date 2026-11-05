@@ -34,8 +34,28 @@ export function getAccessToken() {
   return accessToken;
 }
 
+/**
+ * Marca (sem dados sensíveis) de que existe uma sessão neste navegador.
+ * Evita uma chamada de renovação inútil (e um 401 no console) para visitantes.
+ */
+const SESSION_HINT_KEY = 'fluxo:has-session';
+
+export function hasSessionHint() {
+  try {
+    return localStorage.getItem(SESSION_HINT_KEY) === '1';
+  } catch {
+    return true;
+  }
+}
+
 export function setSession(session: AuthResponse | null) {
   accessToken = session?.accessToken ?? null;
+  try {
+    if (session) localStorage.setItem(SESSION_HINT_KEY, '1');
+    else localStorage.removeItem(SESSION_HINT_KEY);
+  } catch {
+    // Armazenamento indisponível: segue sem a dica.
+  }
   for (const listener of sessionListeners) listener(session);
 }
 
