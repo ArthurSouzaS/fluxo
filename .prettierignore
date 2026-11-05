@@ -1,0 +1,11 @@
+node_modules
+dist
+.next
+out
+coverage
+playwright-report
+test-results
+uploads
+apps/web/public/mockServiceWorker.js
+package-lock.json
+apps/api/prisma/migrations/**/*.sql
