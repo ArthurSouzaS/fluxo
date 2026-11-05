@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createBoardSchema, type BoardTemplate } from '@fluxo/shared';
+import { BOARD_COLORS, createBoardSchema, type BoardTemplate } from '@fluxo/shared';
 import { boardsApi } from '@/lib/api/endpoints';
 import { queryKeys } from '@/lib/api/keys';
 import { apiErrors, validate, type FieldErrors } from '@/lib/forms';
@@ -12,17 +12,6 @@ import { TextArea, TextInput } from '../ui/Field';
 import { Modal } from '../ui/Modal';
 import { useToast } from '../ui/Toast';
 import styles from './CreateBoardDialog.module.scss';
-
-export const BOARD_COLORS = [
-  '#34d399',
-  '#38bdf8',
-  '#a78bfa',
-  '#fbbf24',
-  '#f472b6',
-  '#fb7185',
-  '#2dd4bf',
-  '#94a3b8',
-];
 
 const TEMPLATES: Array<{ value: BoardTemplate; label: string; description: string }> = [
   { value: 'kanban', label: 'Kanban', description: 'A fazer · Em andamento · Concluído' },
@@ -48,7 +37,7 @@ export function CreateBoardDialog({
   const toast = useToast();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState(BOARD_COLORS[0]!);
+  const [color, setColor] = useState<string>(BOARD_COLORS[0]);
   const [template, setTemplate] = useState<BoardTemplate>('kanban');
   const [errors, setErrors] = useState<FieldErrors>({});
 

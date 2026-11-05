@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { updateBoardSchema, type BoardDetail } from '@fluxo/shared';
+import { BOARD_COLORS, updateBoardSchema, type BoardDetail } from '@fluxo/shared';
 import { validate, type FieldErrors } from '@/lib/forms';
 import { useBoardMutations } from '@/lib/useBoardMutations';
 import { Button } from '../ui/Button';
 import { TextArea, TextInput } from '../ui/Field';
 import { Modal } from '../ui/Modal';
 import { useToast } from '../ui/Toast';
-import { BOARD_COLORS } from '../workspace/CreateBoardDialog';
 import formStyles from '../workspace/CreateBoardDialog.module.scss';
 
 export function BoardSettingsDialog({
@@ -47,7 +46,9 @@ export function BoardSettingsDialog({
     });
   };
 
-  const colors = BOARD_COLORS.includes(board.color) ? BOARD_COLORS : [board.color, ...BOARD_COLORS];
+  const colors: string[] = (BOARD_COLORS as readonly string[]).includes(board.color)
+    ? [...BOARD_COLORS]
+    : [board.color, ...BOARD_COLORS];
 
   return (
     <Modal open={open} onClose={onClose} title="Editar quadro">

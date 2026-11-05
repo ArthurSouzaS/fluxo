@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { changePasswordSchema, updateProfileSchema } from '@fluxo/shared';
+import { AVATAR_COLORS, changePasswordSchema, updateProfileSchema } from '@fluxo/shared';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Avatar } from '@/components/ui/Avatar';
@@ -16,17 +16,6 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { apiErrors, validate, type FieldErrors } from '@/lib/forms';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
-const AVATAR_COLORS = [
-  '#34d399',
-  '#38bdf8',
-  '#a78bfa',
-  '#f472b6',
-  '#fbbf24',
-  '#fb7185',
-  '#2dd4bf',
-  '#94a3b8',
-];
-
 export default function SettingsPage() {
   const { user, setUser } = useAuth();
   const { theme, setTheme } = useTheme();
@@ -34,7 +23,7 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState({
     name: '',
     username: '',
-    avatarColor: AVATAR_COLORS[0]!,
+    avatarColor: AVATAR_COLORS[0] as string,
   });
   const [profileErrors, setProfileErrors] = useState<FieldErrors>({});
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirm: '' });

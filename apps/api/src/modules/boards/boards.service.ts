@@ -1,8 +1,11 @@
 import {
+  BOARD_COLORS,
+  DEFAULT_LABELS,
   POSITION_STEP,
+  randomItem,
+  TEMPLATE_COLUMNS,
   type BoardDetail,
   type BoardSummary,
-  type BoardTemplate,
   type CreateBoardInput,
   type Role,
   type UpdateBoardInput,
@@ -21,27 +24,6 @@ import { prisma } from '../../lib/prisma';
 import { realtimeBus } from '../../lib/realtime-bus';
 import { logActivity } from '../activities/activity.logger';
 import { requireBoard, requireWorkspace } from '../access';
-
-const TEMPLATE_COLUMNS: Record<BoardTemplate, Array<{ title: string; isDone?: boolean }>> = {
-  kanban: [{ title: 'A fazer' }, { title: 'Em andamento' }, { title: 'Concluído', isDone: true }],
-  scrum: [
-    { title: 'Backlog' },
-    { title: 'A fazer' },
-    { title: 'Em andamento' },
-    { title: 'Em revisão' },
-    { title: 'Concluído', isDone: true },
-  ],
-  blank: [],
-};
-
-const DEFAULT_LABELS = [
-  { name: 'Bug', color: '#f87171' },
-  { name: 'Melhoria', color: '#34d399' },
-  { name: 'Urgente', color: '#fb923c' },
-  { name: 'Documentação', color: '#38bdf8' },
-];
-
-const BOARD_COLORS = ['#34d399', '#38bdf8', '#a78bfa', '#fbbf24', '#f472b6'];
 
 export async function listByWorkspace(
   ctx: Ctx,
@@ -77,7 +59,7 @@ export async function create(ctx: Ctx, workspaceId: string, rawInput: CreateBoar
         workspaceId,
         title: input.title,
         description: input.description || null,
-        color: input.color ?? BOARD_COLORS[Math.floor(Math.random() * BOARD_COLORS.length)]!,
+        color: input.color ?? randomItem(BOARD_COLORS),
         createdById: ctx.userId,
         columns: {
           create: TEMPLATE_COLUMNS[template].map((column, index) => ({
@@ -86,7 +68,9 @@ export async function create(ctx: Ctx, workspaceId: string, rawInput: CreateBoar
             position: (index + 1) * POSITION_STEP,
           })),
         },
-        labels: { create: template === 'blank' ? [] : DEFAULT_LABELS },
+        labels: {
+          create: template === 'blank' ? [] : DEFAULT_LABELS.map((label) => ({ ...label })),
+        },
       },
     });
     await logActivity(

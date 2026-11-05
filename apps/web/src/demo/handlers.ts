@@ -7,6 +7,10 @@ import { http, HttpResponse, type HttpResponseResolver } from 'msw';
 import { ZodError, type z } from 'zod';
 import {
   addMemberSchema,
+  BOARD_COLORS,
+  DEFAULT_LABELS,
+  randomItem,
+  TEMPLATE_COLUMNS,
   can,
   canChangeRole,
   canRemoveMember,
@@ -633,36 +637,25 @@ export const handlers = [
         workspaceId: params.id!,
         title: input.title,
         description: input.description || null,
-        color: input.color ?? '#38bdf8',
+        color: input.color ?? randomItem(BOARD_COLORS),
         archived: false,
         createdById: userId,
         createdAt: nowIso(),
         updatedAt: nowIso(),
       });
-      const titles = {
-        kanban: ['A fazer', 'Em andamento', 'Concluído'],
-        scrum: ['Backlog', 'A fazer', 'Em andamento', 'Em revisão', 'Concluído'],
-        blank: [],
-      }[input.template];
-      titles.forEach((title, index) =>
+      TEMPLATE_COLUMNS[input.template].forEach((column, index) =>
         db.columns.push({
           id: newId('c'),
           boardId: id,
-          title,
+          title: column.title,
           position: (index + 1) * 1024,
           wipLimit: null,
-          isDone: title === 'Concluído',
+          isDone: column.isDone ?? false,
         }),
       );
       if (input.template !== 'blank') {
-        for (const [name, color] of [
-          ['Bug', '#f87171'],
-          ['Melhoria', '#34d399'],
-          ['Urgente', '#fb923c'],
-          ['Documentação', '#38bdf8'],
-        ] as const) {
-          db.labels.push({ id: newId('l'), boardId: id, name, color });
-        }
+        for (const label of DEFAULT_LABELS)
+          db.labels.push({ id: newId('l'), boardId: id, ...label });
       }
       log(params.id!, id, null, userId, 'board.created', { boardTitle: input.title });
       return [201, boardDetail(id, userId)];

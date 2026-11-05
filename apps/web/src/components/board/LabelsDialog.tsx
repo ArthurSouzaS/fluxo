@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createLabelSchema, type BoardDetail, type Label } from '@fluxo/shared';
+import { createLabelSchema, LABEL_COLORS, type BoardDetail, type Label } from '@fluxo/shared';
 import { labelsApi } from '@/lib/api/endpoints';
 import { queryKeys } from '@/lib/api/keys';
 import { validate } from '@/lib/forms';
@@ -12,18 +12,6 @@ import { Modal } from '../ui/Modal';
 import { errorMessage } from '../ui/States';
 import { useToast } from '../ui/Toast';
 import styles from './LabelsDialog.module.scss';
-
-const LABEL_COLORS = [
-  '#f87171',
-  '#fb923c',
-  '#fbbf24',
-  '#34d399',
-  '#2dd4bf',
-  '#38bdf8',
-  '#a78bfa',
-  '#f472b6',
-  '#94a3b8',
-];
 
 /** Cria, renomeia e exclui as etiquetas do quadro. */
 export function LabelsDialog({
@@ -38,7 +26,7 @@ export function LabelsDialog({
   const queryClient = useQueryClient();
   const toast = useToast();
   const [name, setName] = useState('');
-  const [color, setColor] = useState(LABEL_COLORS[0]!);
+  const [color, setColor] = useState<string>(LABEL_COLORS[0]);
   const [error, setError] = useState<string>();
 
   const sync = (update: (labels: Label[]) => Label[]) =>

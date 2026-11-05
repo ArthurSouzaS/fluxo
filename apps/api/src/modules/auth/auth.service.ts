@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import type { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import {
+  AVATAR_COLORS,
+  randomItem,
   slugifyUsername,
   type ChangePasswordInput,
   type LoginInput,
@@ -18,8 +20,6 @@ import {
   refreshTokenExpiry,
   signAccessToken,
 } from '../../lib/tokens';
-
-const AVATAR_COLORS = ['#34d399', '#38bdf8', '#a78bfa', '#f472b6', '#fbbf24', '#fb7185', '#2dd4bf'];
 
 /** Janela em que reapresentar um token recém-rotacionado não é tratado como roubo. */
 const REUSE_GRACE_MS = 10_000;
@@ -83,7 +83,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
         email: input.email,
         username,
         passwordHash,
-        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]!,
+        avatarColor: randomItem(AVATAR_COLORS),
       },
       select: userProfileSelect,
     });
