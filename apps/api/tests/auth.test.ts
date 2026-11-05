@@ -141,12 +141,27 @@ describe('POST /api/auth/refresh', () => {
     const first = await api().post('/api/auth/refresh').set('Cookie', user.cookie).expect(200);
     const rotated = refreshCookie(first)!;
 
-    // Reutiliza o token antigo: suspeita de roubo.
+    // Reutiliza o token antigo bem depois da rotação: suspeita de roubo.
+    await prisma.refreshToken.updateMany({
+      where: { revokedAt: { not: null } },
+      data: { revokedAt: new Date(Date.now() - 60_000) },
+    });
     const reuse = await api().post('/api/auth/refresh').set('Cookie', user.cookie).expect(401);
     expect(reuse.body.error.code).toBe('REFRESH_REUSED');
 
     // O token novo também deixa de valer.
     await api().post('/api/auth/refresh').set('Cookie', rotated).expect(401);
+  });
+
+  it('tolera duas renovações simultâneas com o mesmo token (várias abas)', async () => {
+    const user = await createUser();
+    const [a, b] = await Promise.all([
+      api().post('/api/auth/refresh').set('Cookie', user.cookie),
+      api().post('/api/auth/refresh').set('Cookie', user.cookie),
+    ]);
+    expect([a.status, b.status]).toEqual([200, 200]);
+    // A sessão continua válida.
+    await api().post('/api/auth/refresh').set('Cookie', refreshCookie(b)!).expect(200);
   });
 
   it('responde 401 sem cookie', async () => {

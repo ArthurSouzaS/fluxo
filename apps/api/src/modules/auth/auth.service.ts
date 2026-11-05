@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import type { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import {
   slugifyUsername,
@@ -19,6 +20,9 @@ import {
 } from '../../lib/tokens';
 
 const AVATAR_COLORS = ['#34d399', '#38bdf8', '#a78bfa', '#f472b6', '#fbbf24', '#fb7185', '#2dd4bf'];
+
+/** Janela em que reapresentar um token recém-rotacionado não é tratado como roubo. */
+const REUSE_GRACE_MS = 10_000;
 
 /** Hash usado quando o e-mail não existe, para o tempo de resposta não denunciar isso. */
 const DUMMY_HASH = bcrypt.hashSync('senha-que-nao-existe', 4);
@@ -50,9 +54,10 @@ export async function generateUniqueUsername(source: string): Promise<string> {
 async function issueTokens(
   userId: string,
   family: string = crypto.randomUUID(),
+  tx: Prisma.TransactionClient = prisma,
 ): Promise<TokenPair> {
   const refreshToken = generateRefreshToken();
-  await prisma.refreshToken.create({
+  await tx.refreshToken.create({
     data: {
       userId,
       family,
@@ -114,7 +119,7 @@ export async function login(input: LoginInput): Promise<AuthResult> {
  * Se um token já revogado for reutilizado, toda a família é revogada:
  * é o sinal clássico de token roubado.
  */
-export async function refresh(refreshToken: string | undefined): Promise<AuthResult> {
+export async function refresh(refreshToken: string | undefined, attempt = 0): Promise<AuthResult> {
   if (!refreshToken) throw unauthorized('Sessão expirada', 'REFRESH_MISSING');
 
   const stored = await prisma.refreshToken.findUnique({
@@ -123,6 +128,20 @@ export async function refresh(refreshToken: string | undefined): Promise<AuthRes
   if (!stored) throw unauthorized('Sessão inválida', 'REFRESH_INVALID');
 
   if (stored.revokedAt) {
+    // Duas abas (ou duas requisições) renovando ao mesmo tempo com o mesmo token
+    // não indicam roubo: dentro da janela de tolerância, apenas emite um novo par.
+    const elapsed = Date.now() - stored.revokedAt.getTime();
+    const familyAlive =
+      stored.rotatedAt !== null &&
+      (await prisma.refreshToken.count({ where: { family: stored.family, revokedAt: null } })) > 0;
+    if (familyAlive && elapsed <= REUSE_GRACE_MS && stored.expiresAt > new Date()) {
+      const user = await prisma.user.findUnique({
+        where: { id: stored.userId },
+        select: userProfileSelect,
+      });
+      if (!user) throw unauthorized('Sessão inválida', 'REFRESH_INVALID');
+      return { user: toUserProfile(user), ...(await issueTokens(user.id, stored.family)) };
+    }
     await prisma.refreshToken.updateMany({
       where: { family: stored.family, revokedAt: null },
       data: { revokedAt: new Date() },
@@ -131,20 +150,26 @@ export async function refresh(refreshToken: string | undefined): Promise<AuthRes
   }
   if (stored.expiresAt <= new Date()) throw unauthorized('Sessão expirada', 'REFRESH_EXPIRED');
 
-  // Revoga de forma condicional para evitar corrida entre duas requisições simultâneas.
-  const { count } = await prisma.refreshToken.updateMany({
-    where: { id: stored.id, revokedAt: null },
-    data: { revokedAt: new Date() },
-  });
-  if (count === 0) throw unauthorized('Sessão inválida', 'REFRESH_REUSED');
-
   const user = await prisma.user.findUnique({
     where: { id: stored.userId },
     select: userProfileSelect,
   });
   if (!user) throw unauthorized('Sessão inválida', 'REFRESH_INVALID');
 
-  const tokens = await issueTokens(user.id, stored.family);
+  // Revoga e emite o novo token na mesma transação: uma requisição concorrente
+  // com o mesmo token espera o commit e cai na janela de tolerância acima.
+  const now = new Date();
+  const tokens = await prisma.$transaction(async (tx) => {
+    const { count } = await tx.refreshToken.updateMany({
+      where: { id: stored.id, revokedAt: null },
+      data: { revokedAt: now, rotatedAt: now },
+    });
+    return count === 0 ? null : issueTokens(user.id, stored.family, tx);
+  });
+  if (!tokens) {
+    if (attempt > 0) throw unauthorized('Sessão inválida', 'REFRESH_REUSED');
+    return refresh(refreshToken, attempt + 1);
+  }
   return { user: toUserProfile(user), ...tokens };
 }
 

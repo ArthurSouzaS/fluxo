@@ -14,7 +14,7 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 
 ## API
 
-8. **Refresh token opaco + rotação com detecção de reuso.** O refresh token é um valor aleatório guardado no banco apenas como HMAC-SHA256. A cada uso ele é revogado e substituído; se um token já revogado for reapresentado, toda a "família" (sessão) é encerrada. Ele trafega só em cookie `httpOnly` (`SameSite=Lax`, `Path=/api/auth`); o access token (JWT de 15 min) fica apenas em memória na web.
+8. **Refresh token opaco + rotação com detecção de reuso.** O refresh token é um valor aleatório guardado no banco apenas como HMAC-SHA256. A cada uso ele é revogado e substituído; se um token já revogado for reapresentado, toda a "família" (sessão) é encerrada. Ele trafega só em cookie `httpOnly` (`SameSite=Lax`, `Path=/api/auth`); o access token (JWT de 15 min) fica apenas em memória na web. Para não derrubar a sessão quando duas abas renovam ao mesmo tempo, reapresentar um token que acabou de ser *rotacionado* (até 10 s) gera um novo par em vez de ser tratado como roubo — desde que a sessão continue ativa (logout e troca de senha encerram a família de vez).
 9. **404 em vez de 403 para quem não é membro.** Recursos de workspaces dos quais o usuário não participa respondem 404, para não revelar que existem. Membros sem permissão para a ação recebem 403.
 10. **Posições em ponto flutuante.** Mover um cartão/coluna atualiza só uma linha (ponto médio entre vizinhos). Quando não há mais espaço, a lista é renumerada e o evento `cards.reordered` é enviado.
 11. **Coluna "concluída" (`isDone`).** Em vez de um status separado, cada quadro marca quais colunas significam "feito". Entrar nelas preenche `completedAt` (usado no dashboard); sair limpa.
