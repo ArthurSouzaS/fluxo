@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { LoginInput, RegisterInput, UserProfile } from '@fluxo/shared';
-import { hasSessionHint, onSessionChange, refreshSession, setSession } from '../api/client';
+import { onSessionChange, restoreSessionOnce, setSession } from '../api/client';
 import { authApi } from '../api/endpoints';
 
 type Status = 'loading' | 'authenticated' | 'anonymous';
@@ -31,22 +31,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<Status>('loading');
   const [user, setUser] = useState<UserProfile | null>(null);
+  // Dispara a restauração já na renderização (antes das consultas dos filhos).
+  const [restore] = useState(() => (typeof window === 'undefined' ? null : restoreSessionOnce()));
 
   useEffect(() => {
     const off = onSessionChange((session) => {
       setUser(session?.user ?? null);
       setStatus(session ? 'authenticated' : 'anonymous');
     });
-    // Restaura a sessão a partir do cookie de refresh (se houve login neste navegador).
-    if (!hasSessionHint()) {
-      setStatus('anonymous');
-    } else {
-      void refreshSession().then((session) => {
-        if (!session) setStatus('anonymous');
-      });
-    }
+    // Sessão restaurada a partir do cookie de refresh (se houve login neste navegador).
+    void (restore ?? restoreSessionOnce()).then((session) => {
+      if (session) {
+        setUser(session.user);
+        setStatus('authenticated');
+      } else {
+        setStatus((current) => (current === 'loading' ? 'anonymous' : current));
+      }
+    });
     return off;
-  }, []);
+  }, [restore]);
 
   const login = useCallback(async (input: LoginInput) => {
     setSession(await authApi.login(input));

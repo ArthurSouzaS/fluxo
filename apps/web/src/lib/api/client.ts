@@ -105,6 +105,18 @@ export function refreshSession(): Promise<AuthResponse | null> {
   return refreshInFlight;
 }
 
+let restoring: Promise<AuthResponse | null> | null = null;
+
+/**
+ * Restaura a sessão (uma única vez por carregamento). Chamada durante a
+ * renderização do AuthProvider, antes de qualquer consulta dos componentes
+ * filhos — que aguardam essa promessa em vez de receber 401.
+ */
+export function restoreSessionOnce(): Promise<AuthResponse | null> {
+  restoring ??= hasSessionHint() ? refreshSession() : Promise.resolve(null);
+  return restoring;
+}
+
 type Query = Record<string, string | number | boolean | string[] | undefined | null>;
 
 export interface RequestOptions {
@@ -134,6 +146,7 @@ export async function request<T>(
   options: RequestOptions = {},
   retried = false,
 ): Promise<T> {
+  if (!accessToken && restoring && !path.startsWith('/auth/')) await restoring;
   const headers: Record<string, string> = {};
   const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
   if (options.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
