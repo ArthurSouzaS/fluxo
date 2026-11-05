@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   closestCorners,
   DndContext,
@@ -15,6 +15,7 @@ import {
   type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
+  type KeyboardCoordinateGetter,
   closestCenter,
 } from '@dnd-kit/core';
 import {
@@ -101,10 +102,33 @@ export function BoardCanvas({
     ? columnOrder.map((id) => columns.find((column) => column.id === id)!).filter(Boolean)
     : columns;
 
+  // Teclado: ←/→ leva o cartão para a coluna vizinha; ↑/↓ reordena (padrão do dnd-kit).
+  const keyboardState = useRef({ containers: currentContainers, columns: orderedColumns });
+  keyboardState.current = { containers: currentContainers, columns: orderedColumns };
+  const coordinateGetter = useRef<KeyboardCoordinateGetter>((event, args) => {
+    const activeId = String(args.active);
+    const horizontal = event.code === 'ArrowRight' || event.code === 'ArrowLeft';
+    if (horizontal && !isColumnId(activeId)) {
+      const { containers: source, columns: cols } = keyboardState.current;
+      const from = Object.keys(source).find((columnId) => source[columnId]!.includes(activeId));
+      const index = cols.findIndex((column) => column.id === from);
+      const next = cols[index + (event.code === 'ArrowRight' ? 1 : -1)];
+      const element = next && document.querySelector(`[data-column-id="${next.id}"] ul`);
+      const rect = args.context.collisionRect;
+      if (element && rect) {
+        event.preventDefault();
+        const target = element.getBoundingClientRect();
+        return { x: target.left + (target.width - rect.width) / 2, y: target.top + 8 };
+      }
+      return undefined;
+    }
+    return sortableKeyboardCoordinates(event, args);
+  }).current;
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter }),
   );
 
   const findContainer = (id: string, source: Containers = currentContainers) => {
