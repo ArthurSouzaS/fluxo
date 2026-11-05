@@ -7,7 +7,7 @@ Gerenciador de projetos colaborativo em tempo real (estilo Trello/Jira).
 - [x] **Fase 3** — API: autenticação completa, CRUD, permissões por papel, ordenação, busca/filtros, paginação, upload de anexos, log de atividades e Swagger em `/docs`
 - [x] **Fase 4** — Tempo real: Socket.io com salas por quadro, presença e notificações em tempo real (menções com @)
 - [x] **Fase 5** — Web parte 1: login/cadastro, workspaces e quadros, quadro com arrastar e soltar (dnd-kit) e atualização otimista
-- [ ] **Fase 6** — Web parte 2: modal do cartão, filtros, busca global (Ctrl+K), central de notificações, configurações de workspace e membros
+- [x] **Fase 6** — Web parte 2: modal do cartão, filtros, busca global (Ctrl+K), central de notificações, configurações de workspace e membros
 - [ ] **Fase 7** — Dashboard por quadro com gráficos SVG próprios
 - [ ] **Fase 8** — Visual e UX: temas escuro/claro, responsivo, acessível, estados de carregamento/vazio/erro, atalhos de teclado
 - [ ] **Fase 9** — Testes: unitários (Vitest), integração (Supertest), componentes e E2E (Playwright)
