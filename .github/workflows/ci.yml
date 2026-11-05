@@ -53,6 +53,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @fluxo/api exec prisma generate
       - run: pnpm --filter @fluxo/api exec prisma migrate deploy
       - run: pnpm test:integration
 
@@ -79,6 +80,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @fluxo/api exec prisma generate
       - run: pnpm --filter @fluxo/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
