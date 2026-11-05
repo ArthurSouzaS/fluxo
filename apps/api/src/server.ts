@@ -7,7 +7,7 @@ import { attachRealtime } from './realtime/socket';
 
 const app = createApp();
 const server = http.createServer(app);
-const io = attachRealtime(server);
+const realtime = attachRealtime(server);
 
 server.listen(env.PORT, () => {
   logger.info(`Fluxo API ouvindo em http://localhost:${env.PORT} (docs em /docs)`);
@@ -15,7 +15,7 @@ server.listen(env.PORT, () => {
 
 async function shutdown(signal: string) {
   logger.info(`${signal} recebido, encerrando...`);
-  io.close();
+  await realtime.close();
   server.close();
   await prisma.$disconnect();
   process.exit(0);
