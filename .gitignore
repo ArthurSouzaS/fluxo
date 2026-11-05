@@ -15,3 +15,5 @@ apps/api/uploads/*
 .DS_Store
 *.log
 next-env.d.ts
+.next-e2e/
+apps/api/uploads-e2e/

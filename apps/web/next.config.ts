@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   // o modo normal gera um servidor enxuto para o Docker.
   output: isDemo ? 'export' : 'standalone',
   basePath: basePath || undefined,
+  // Pasta de build separada para os testes E2E não conflitarem com o `next dev`.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   trailingSlash: isDemo,
   images: { unoptimized: true },
   reactStrictMode: true,

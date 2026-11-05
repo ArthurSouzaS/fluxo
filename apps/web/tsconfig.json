@@ -5,10 +5,24 @@
     "jsx": "preserve",
     "allowJs": false,
     "noEmit": true,
-    "incremental": true,
-    "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./src/*"] }
+    "incremental": false,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["next-env.d.ts", "src", "e2e", "*.config.ts", "*.config.mts", ".next/types/**/*.ts"],
+  "include": [
+    "*.config.mts",
+    "*.config.ts",
+    ".next/types/**/*.ts",
+    "e2e",
+    "next-env.d.ts",
+    "src",
+    ".next-e2e/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
