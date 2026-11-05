@@ -1,0 +1,25 @@
+@use '../../styles/mixins' as *;
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(90deg, rgb(167 139 250 / 0.22), rgb(56 189 248 / 0.22));
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+
+  svg {
+    color: var(--purple-text);
+  }
+}
+
+.text {
+  color: var(--text-muted);
+
+  @include down($bp-md) {
+    display: none;
+  }
+}
