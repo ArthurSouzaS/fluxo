@@ -5,6 +5,7 @@
   inset: 0;
   z-index: 150;
   display: flex;
+  align-items: flex-start;
   justify-content: center;
   padding: 12vh 16px 16px;
   background: var(--overlay);
