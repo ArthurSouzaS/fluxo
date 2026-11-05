@@ -51,3 +51,10 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 30. **MSW no navegador em vez de um back-end hospedado.** O GitHub Pages só serve arquivos estáticos; o build de demonstração (`NEXT_PUBLIC_DEMO=true`, `basePath` `/fluxo`) registra um Service Worker do MSW que responde às rotas da API. Os handlers reaproveitam os schemas Zod, as permissões, a ordenação e o cálculo do dashboard do pacote compartilhado, e os dados iniciais são os mesmos do seed. As alterações ficam no `localStorage` (botão "Restaurar dados" no aviso), anexos ficam só em memória (até 500 KB) e a presença "online" é simulada.
 31. **Código da demonstração fora do bundle normal.** O MSW é carregado com `import()` dinâmico apenas quando `IS_DEMO` é verdadeiro; no build do Docker esse ramo é eliminado.
 32. **Publicação a partir da `main`.** O workflow `pages.yml` roda em pushes na `main` (ou manualmente). É preciso habilitar uma vez em _Settings → Pages → Source: GitHub Actions_.
+
+## Revisão final
+
+33. **`TRUST_PROXY` explícito.** Antes, em produção a API confiava em um proxy automaticamente; sem proxy de verdade (como no Docker Compose), qualquer cliente poderia forjar `X-Forwarded-For` e escapar do rate limit. Agora o padrão é não confiar, e quem publicar atrás de um proxy configura o número de saltos.
+34. **`x-socket-id` validado.** O servidor só deixa de enviar o evento para o socket de origem se esse socket pertence a quem fez a ação — um cliente não consegue "silenciar" outra pessoa informando o socket dela.
+35. **Dados de exemplo com fonte única.** O gerador dos dados (`createDemoDb` em `@fluxo/shared/demo`) é usado tanto pelo seed do banco quanto pelo modo demonstração; antes havia dois códigos paralelos.
+36. **Validação do Docker.** Os Dockerfiles foram conferidos e os artefatos de produção testados fora do Docker (`node dist/server.js` e o servidor standalone do Next). No ambiente onde o projeto foi desenvolvido, os containers de build não tinham acesso à internet para baixar pacotes, então o `docker compose build` completo deve ser executado na sua máquina.

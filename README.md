@@ -328,23 +328,24 @@ O resultado fica em `apps/web/out`; sirva a pasta `out` como `/fluxo` em qualque
 
 ### API (`apps/api/.env`)
 
-| Variável                | Padrão                       | Descrição                                                                  |
-| ----------------------- | ---------------------------- | -------------------------------------------------------------------------- |
-| `NODE_ENV`              | `development`                | `development`, `test` ou `production`                                      |
-| `PORT`                  | `3333`                       | Porta HTTP da API e do Socket.io                                           |
-| `DATABASE_URL`          | —                            | URL de conexão do PostgreSQL (**obrigatória**)                             |
-| `JWT_ACCESS_SECRET`     | —                            | Segredo do access token, mínimo 32 caracteres (**obrigatória**)            |
-| `JWT_REFRESH_SECRET`    | —                            | Segredo do HMAC dos refresh tokens, mínimo 32 caracteres (**obrigatória**) |
-| `JWT_ACCESS_EXPIRES_IN` | `15m`                        | Validade do access token                                                   |
-| `REFRESH_TOKEN_DAYS`    | `7`                          | Validade do refresh token, em dias                                         |
-| `CORS_ORIGIN`           | `http://localhost:3000`      | Origens permitidas (separadas por vírgula)                                 |
-| `UPLOAD_DIR`            | `./uploads`                  | Pasta dos anexos                                                           |
-| `UPLOAD_MAX_MB`         | `10`                         | Tamanho máximo de um anexo                                                 |
-| `COOKIE_SECURE`         | `false`                      | `true` atrás de HTTPS (cookie `Secure`, HSTS)                              |
-| `RATE_LIMIT_ENABLED`    | ligado (desligado em `test`) | Liga/desliga o rate limit                                                  |
-| `BCRYPT_ROUNDS`         | `10` (`4` em `test`)         | Custo do bcrypt                                                            |
-| `LOG_LEVEL`             | `info`                       | Nível de log do pino                                                       |
-| `SEED_ON_START`         | —                            | No Docker, `true` popula o banco se estiver vazio                          |
+| Variável                | Padrão                       | Descrição                                                                    |
+| ----------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
+| `NODE_ENV`              | `development`                | `development`, `test` ou `production`                                        |
+| `PORT`                  | `3333`                       | Porta HTTP da API e do Socket.io                                             |
+| `DATABASE_URL`          | —                            | URL de conexão do PostgreSQL (**obrigatória**)                               |
+| `JWT_ACCESS_SECRET`     | —                            | Segredo do access token, mínimo 32 caracteres (**obrigatória**)              |
+| `JWT_REFRESH_SECRET`    | —                            | Segredo do HMAC dos refresh tokens, mínimo 32 caracteres (**obrigatória**)   |
+| `JWT_ACCESS_EXPIRES_IN` | `15m`                        | Validade do access token                                                     |
+| `REFRESH_TOKEN_DAYS`    | `7`                          | Validade do refresh token, em dias                                           |
+| `CORS_ORIGIN`           | `http://localhost:3000`      | Origens permitidas (separadas por vírgula)                                   |
+| `UPLOAD_DIR`            | `./uploads`                  | Pasta dos anexos                                                             |
+| `UPLOAD_MAX_MB`         | `10`                         | Tamanho máximo de um anexo                                                   |
+| `TRUST_PROXY`           | `0`                          | Quantidade de proxies reversos confiáveis (para o rate limit usar o IP real) |
+| `COOKIE_SECURE`         | `false`                      | `true` atrás de HTTPS (cookie `Secure`, HSTS)                                |
+| `RATE_LIMIT_ENABLED`    | ligado (desligado em `test`) | Liga/desliga o rate limit                                                    |
+| `BCRYPT_ROUNDS`         | `10` (`4` em `test`)         | Custo do bcrypt                                                              |
+| `LOG_LEVEL`             | `info`                       | Nível de log do pino                                                         |
+| `SEED_ON_START`         | —                            | No Docker, `true` popula o banco se estiver vazio                            |
 
 ### Web (`apps/web/.env.local`)
 
