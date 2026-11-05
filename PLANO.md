@@ -2,7 +2,7 @@
 
 Gerenciador de projetos colaborativo em tempo real (estilo Trello/Jira).
 
-- [ ] **Fase 1** — Estrutura do monorepo, configurações (ESLint, Prettier, tsconfig), Docker Compose e CI no GitHub Actions
+- [x] **Fase 1** — Estrutura do monorepo, configurações (ESLint, Prettier, tsconfig), Docker Compose e CI no GitHub Actions
 - [ ] **Fase 2** — Banco: schema Prisma (usuários, workspaces, membros com papéis, quadros, colunas, cartões, etiquetas, checklists, comentários, anexos, atividades e notificações) e seed com dados realistas em português
 - [ ] **Fase 3** — API: autenticação completa, CRUD, permissões por papel, ordenação, busca/filtros, paginação, upload de anexos, log de atividades e Swagger em `/docs`
 - [ ] **Fase 4** — Tempo real: Socket.io com salas por quadro, presença e notificações em tempo real (menções com @)
