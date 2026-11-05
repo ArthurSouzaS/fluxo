@@ -130,8 +130,13 @@ function CardItemBase({ card, labels, members, onOpen, disabled }: CardItemProps
         data-card-id={card.id}
         onClick={() => onOpen(card.id)}
         onKeyDown={(event) => {
+          // Enter abre o cartão; Espaço pega/solta para arrastar.
+          if (event.key === 'Enter' && !isDragging) {
+            event.preventDefault();
+            onOpen(card.id);
+            return;
+          }
           listeners?.onKeyDown?.(event);
-          if (event.key === 'Enter' && !event.defaultPrevented) onOpen(card.id);
         }}
       >
         <CardContent card={card} labels={labels} members={members} />

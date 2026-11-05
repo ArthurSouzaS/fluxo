@@ -128,7 +128,10 @@ export function BoardCanvas({
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter,
+      keyboardCodes: { start: ['Space'], cancel: ['Escape'], end: ['Space', 'Enter'] },
+    }),
   );
 
   const findContainer = (id: string, source: Containers = currentContainers) => {
@@ -264,7 +267,7 @@ export function BoardCanvas({
         announcements,
         screenReaderInstructions: {
           draggable:
-            'Para pegar um item, pressione Espaço ou Enter. Use as setas para mover e pressione Espaço ou Enter de novo para soltar, ou Esc para cancelar.',
+            'Para pegar um item, pressione Espaço. Use as setas para mover e pressione Espaço de novo para soltar, ou Esc para cancelar. Enter abre o cartão.',
         },
       }}
     >

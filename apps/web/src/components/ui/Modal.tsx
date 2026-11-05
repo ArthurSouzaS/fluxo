@@ -45,7 +45,8 @@ export function Modal({
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (!open) return;
+    // Só depois do portal montado o painel existe para receber foco e teclas.
+    if (!open || !mounted) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     stack.push(id);
     const { overflow } = document.body.style;
@@ -68,7 +69,8 @@ export function Modal({
       }
       if (event.key !== 'Tab') return;
       const focusable = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
-        (element) => element.offsetParent !== null || element === document.activeElement,
+        (element) =>
+          !element.closest('[hidden], [inert]') && element.getAttribute('type') !== 'hidden',
       );
       if (focusable.length === 0) {
         event.preventDefault();
@@ -95,7 +97,7 @@ export function Modal({
       if (stack.length === 0) document.body.style.overflow = overflow;
       previouslyFocused?.focus?.();
     };
-  }, [open, id, initialFocus]);
+  }, [open, mounted, id, initialFocus]);
 
   if (!open || !mounted) return null;
 
