@@ -1,0 +1,107 @@
+@use '../../styles/mixins' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 6vh 16px 16px;
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
+  overflow-y: auto;
+  animation: fade 120ms ease-out;
+
+  @include down($bp-sm) {
+    padding: 0;
+    align-items: stretch;
+  }
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  animation: rise 160ms ease-out;
+
+  &:focus {
+    outline: none;
+  }
+
+  @include down($bp-sm) {
+    min-height: 100%;
+    border-radius: 0;
+    border: none;
+  }
+}
+
+.sm {
+  max-width: 420px;
+}
+
+.md {
+  max-width: 560px;
+}
+
+.lg {
+  max-width: 760px;
+}
+
+.xl {
+  max-width: 980px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 0;
+}
+
+.titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.description {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.close {
+  margin: -6px -8px 0 0;
+}
+
+.body {
+  padding: 16px 20px 20px;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+}
