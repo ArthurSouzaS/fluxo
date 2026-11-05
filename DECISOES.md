@@ -24,3 +24,9 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 15. **Anexos em disco local** com nome aleatório (UUID) no servidor, lista de tipos permitidos (MIME + extensão precisam bater), limite de tamanho e download apenas autenticado. A permissão é verificada antes de gravar o arquivo.
 16. **Swagger gerado dos schemas Zod** (`z.toJSONSchema`), para a documentação nunca divergir da validação.
 17. **Rate limit**: 300 req/min por IP na API, 20 tentativas de login/cadastro com falha a cada 15 min e 20 uploads/min. Desligado nos testes automatizados (exceto no teste específico de rate limit).
+
+## Tempo real
+
+18. **Barramento de eventos desacoplado.** Os services publicam em `realtimeBus` sem conhecer o Socket.io; o módulo de tempo real se inscreve ao subir o servidor. Isso deixa os services testáveis sem socket e permite trocar o transporte no futuro (ex.: Redis adapter para várias instâncias).
+19. **Sem eco para quem originou a ação.** A web envia o id do socket no cabeçalho `x-socket-id`; o evento vai para a sala `board:<id>` exceto esse socket, porque a interface dele já foi atualizada de forma otimista.
+20. **Autenticação no handshake** com o access token. Ao entrar em um quadro, a permissão é conferida; quando os membros mudam, a sala é revalidada e quem perdeu acesso é removido. Uma conexão já aberta continua válida após o token expirar (a web reconecta com um token novo ao renovar a sessão).
