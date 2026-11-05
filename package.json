@@ -1,0 +1,52 @@
+{
+  "name": "fluxo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fluxo — gerenciador de projetos colaborativo em tempo real",
+  "author": "Arthur Souza Soares",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c green,cyan \"pnpm --filter @fluxo/api dev\" \"pnpm --filter @fluxo/web dev\"",
+    "build": "pnpm -r build",
+    "build:demo": "pnpm --filter @fluxo/web build:demo",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:unit": "pnpm -r test:unit",
+    "test:integration": "pnpm --filter @fluxo/api test:integration",
+    "test:e2e": "pnpm --filter @fluxo/web test:e2e",
+    "db:migrate": "pnpm --filter @fluxo/api db:migrate",
+    "db:deploy": "pnpm --filter @fluxo/api db:deploy",
+    "db:seed": "pnpm --filter @fluxo/api db:seed",
+    "db:reset": "pnpm --filter @fluxo/api db:reset",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@next/eslint-plugin-next": "^15.5.29",
+    "concurrently": "^9.2.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "pnpm": {
+    "overrides": {
+      "postcss": "^8.5.32",
+      "@typescript-eslint/typescript-estree>minimatch": "^11.0.4",
+      "esbuild": "^0.28.1"
+    }
+  }
+}

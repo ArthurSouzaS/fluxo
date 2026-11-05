@@ -1,0 +1,148 @@
+@use '../../styles/mixins' as *;
+
+.card {
+  @include card-surface;
+  padding: 20px;
+
+  & + & {
+    margin-top: 20px;
+  }
+}
+
+.cardTitle {
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.cardDescription {
+  margin: 4px 0 18px;
+  color: var(--text-muted);
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  max-width: 520px;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+}
+
+.inviteForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px auto;
+  align-items: start;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+
+  > button {
+    margin-top: 25px;
+  }
+
+  @include down($bp-sm) {
+    grid-template-columns: 1fr;
+
+    > button {
+      margin-top: 0;
+    }
+  }
+}
+
+.members {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.memberInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  span {
+    color: var(--text-subtle);
+    font-size: 13px;
+    @include truncate;
+  }
+}
+
+.you {
+  font-weight: 400;
+}
+
+.roleSelect {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.roleBadge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    color: var(--text-subtle);
+    font-size: 13px;
+  }
+}
+
+.danger {
+  border-color: color-mix(in srgb, var(--red) 45%, var(--border));
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.swatch {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+
+  &[aria-checked='true'] {
+    box-shadow:
+      0 0 0 2px var(--surface),
+      0 0 0 4px var(--text);
+  }
+}

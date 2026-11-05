@@ -1,0 +1,90 @@
+.markdown {
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  p,
+  ul,
+  ol,
+  pre,
+  blockquote,
+  table {
+    margin: 0 0 10px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 16px 0 8px;
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  ul,
+  ol {
+    padding-left: 22px;
+  }
+
+  li:has(> input[type='checkbox']) {
+    list-style: none;
+    margin-left: -20px;
+  }
+
+  code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--surface-3);
+  }
+
+  pre {
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    overflow-x: auto;
+
+    code {
+      padding: 0;
+      background: none;
+    }
+  }
+
+  blockquote {
+    padding-left: 12px;
+    border-left: 3px solid var(--border-strong);
+    color: var(--text-muted);
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+  }
+}
+
+.mention {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  color: var(--blue-text);
+  font-weight: 550;
+}
+
+.image {
+  color: var(--text-subtle);
+  font-style: italic;
+}

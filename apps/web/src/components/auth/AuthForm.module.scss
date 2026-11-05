@@ -1,0 +1,27 @@
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.formError {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--red) 40%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+  color: var(--red-text);
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+
+  code {
+    color: var(--text);
+  }
+}

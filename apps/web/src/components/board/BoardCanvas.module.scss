@@ -1,0 +1,35 @@
+@use '../../styles/mixins' as *;
+
+.canvas {
+  // Contém os elementos absolutos (textos para leitor de tela) dentro da rolagem.
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 0;
+  height: 100%;
+  padding: 16px 20px 24px;
+  overflow-x: auto;
+  @include scrollbar;
+
+  @include down($bp-sm) {
+    padding: 12px;
+    scroll-snap-type: x mandatory;
+  }
+}
+
+.addColumn {
+  flex-shrink: 0;
+  width: 280px;
+}
+
+.columnGhost {
+  width: 296px;
+  padding: 14px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-lg);
+  background: var(--column-bg);
+  box-shadow: var(--shadow-lg);
+  font-weight: 650;
+}
