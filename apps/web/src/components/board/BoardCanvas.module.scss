@@ -1,6 +1,8 @@
 @use '../../styles/mixins' as *;
 
 .canvas {
+  // Contém os elementos absolutos (textos para leitor de tela) dentro da rolagem.
+  position: relative;
   display: flex;
   flex: 1;
   align-items: flex-start;
