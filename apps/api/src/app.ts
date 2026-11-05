@@ -36,7 +36,7 @@ export function createApp(options: AppOptions = {}) {
   const limiters = createRateLimiters({ enabled: options.rateLimit ?? env.rateLimitEnabled });
 
   app.disable('x-powered-by');
-  app.set('trust proxy', env.isProduction ? 1 : false);
+  app.set('trust proxy', env.TRUST_PROXY);
 
   // Sem HTTPS (desenvolvimento/Docker local), não force upgrade de requisições.
   const httpsOnly = env.COOKIE_SECURE;

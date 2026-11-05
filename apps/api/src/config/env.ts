@@ -31,6 +31,11 @@ const envSchema = z.object({
     .enum(['true', 'false'])
     .optional()
     .transform((v) => (v === undefined ? undefined : v === 'true')),
+  /**
+   * Quantos proxies confiáveis existem na frente da API (ex.: 1 atrás de Nginx/Render).
+   * Com 0, o IP do cliente vem da conexão — evita burlar o rate limit forjando X-Forwarded-For.
+   */
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).optional(),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).optional(),
 });

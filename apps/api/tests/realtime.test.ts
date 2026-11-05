@@ -210,3 +210,24 @@ describe('Socket.io', () => {
     await silent;
   });
 });
+
+describe('Socket.io — origem do evento', () => {
+  it('ignora x-socket-id de outra pessoa (não silencia o evento dela)', async () => {
+    const { board, owner, member } = await scenario();
+    const card = await createCard(owner, board.columns[0]!.id);
+    const victim = await open(member);
+    await join(victim, board.id);
+    const received = next(
+      victim,
+      'board:event',
+      (e: BoardEventEnvelope) => e.event.type === 'card.updated',
+    );
+    await api()
+      .patch(`/api/cards/${card.id}`)
+      .set(owner.auth)
+      .set('x-socket-id', victim.id!)
+      .send({ title: 'Ainda chega' })
+      .expect(200);
+    expect((await received).event).toMatchObject({ card: { title: 'Ainda chega' } });
+  });
+});

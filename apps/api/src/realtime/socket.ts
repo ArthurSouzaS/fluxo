@@ -131,7 +131,11 @@ export function attachRealtime(server: http.Server) {
 
   const offBoard = realtimeBus.onBoardEvent((envelope, exceptSocketId) => {
     const room = boardRoom(envelope.boardId);
-    const target = exceptSocketId ? io.to(room).except(exceptSocketId) : io.to(room);
+    // Só omite o socket de origem se ele for mesmo de quem fez a ação
+    // (o cabeçalho x-socket-id vem do cliente e não pode silenciar outra pessoa).
+    const origin = exceptSocketId ? io.sockets.sockets.get(exceptSocketId) : undefined;
+    const skip = origin && origin.data.user?.id === envelope.actorId ? origin.id : undefined;
+    const target = skip ? io.to(room).except(skip) : io.to(room);
     target.emit('board:event', envelope);
 
     if (envelope.event.type === 'board.deleted') {
