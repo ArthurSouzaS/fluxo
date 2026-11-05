@@ -1,0 +1,219 @@
+@use 'mixins' as *;
+
+// ---------------------------------------------------------------------------
+// Tokens de design — tema escuro (padrão) e claro
+// ---------------------------------------------------------------------------
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b0d12;
+  --bg-gradient:
+    radial-gradient(1200px 600px at 10% -10%, rgb(52 211 153 / 0.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgb(167 139 250 / 0.06), transparent 60%);
+  --surface: #12151c;
+  --surface-2: #171b24;
+  --surface-3: #1e2330;
+  --column-bg: #10131a;
+  --overlay: rgb(3 5 9 / 0.72);
+  --border: #232937;
+  --border-strong: #323a4c;
+  --text: #e7eaf0;
+  --text-muted: #a1a9ba;
+  --text-subtle: #737d92;
+
+  --green: #34d399;
+  --blue: #38bdf8;
+  --purple: #a78bfa;
+  --red: #f87171;
+  --amber: #fbbf24;
+  // Versões para texto sobre o fundo (contraste AA).
+  --green-text: #34d399;
+  --blue-text: #38bdf8;
+  --purple-text: #c4b5fd;
+  --red-text: #fca5a5;
+  --amber-text: #fcd34d;
+
+  --primary: var(--green);
+  --primary-hover: #4ade80;
+  --on-primary: #052e1f;
+  --focus: #38bdf8;
+  --danger: #ef4444;
+  --on-danger: #ffffff;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.55);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f6fa;
+  --bg-gradient:
+    radial-gradient(1200px 600px at 10% -10%, rgb(52 211 153 / 0.12), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgb(167 139 250 / 0.1), transparent 60%);
+  --surface: #ffffff;
+  --surface-2: #f1f3f8;
+  --surface-3: #e7eaf2;
+  --column-bg: #eceff5;
+  --overlay: rgb(15 23 42 / 0.45);
+  --border: #dde1ea;
+  --border-strong: #c5cbd8;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-subtle: #64748b;
+
+  --green-text: #047857;
+  --blue-text: #0369a1;
+  --purple-text: #6d28d9;
+  --red-text: #b91c1c;
+  --amber-text: #92400e;
+
+  --primary: #34d399;
+  --primary-hover: #10b981;
+  --on-primary: #052e1f;
+  --focus: #0284c7;
+  --danger: #dc2626;
+
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.08);
+  --shadow-md: 0 8px 24px rgb(15 23 42 / 0.12);
+  --shadow-lg: 0 24px 64px rgb(15 23 42 / 0.18);
+}
+
+:root {
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --topbar-height: 56px;
+  --transition: 150ms ease;
+}
+
+// ---------------------------------------------------------------------------
+// Reset e base
+// ---------------------------------------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg-gradient), var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+a {
+  color: var(--blue-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+:focus-visible {
+  @include focus-ring;
+}
+
+::selection {
+  background: rgb(56 189 248 / 0.35);
+}
+
+img {
+  max-width: 100%;
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}
+
+// Link "pular para o conteúdo" (acessibilidade).
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--transition);
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
