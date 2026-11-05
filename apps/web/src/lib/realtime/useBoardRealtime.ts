@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { BoardDetail, BoardEventEnvelope, PresencePayload, UserPublic } from '@fluxo/shared';
 import { queryKeys } from '../api/keys';
+import { IS_DEMO } from '../config';
 import { applyBoardEvent } from '../board-state';
 import { getSocket, onSocketChange, type AppSocket } from './socket';
 
@@ -17,6 +18,17 @@ export function useBoardRealtime(boardId: string | null, onDeleted?: () => void)
   const [socket, setSocket] = useState<AppSocket | null>(() => getSocket());
 
   useEffect(() => onSocketChange(setSocket), []);
+
+  // Na demonstração não há servidor de tempo real: simula colegas online.
+  useEffect(() => {
+    if (!IS_DEMO || !boardId) return;
+    const board = queryClient.getQueryData<BoardDetail>(queryKeys.board(boardId));
+    const timer = setTimeout(() => {
+      const current = queryClient.getQueryData<BoardDetail>(queryKeys.board(boardId)) ?? board;
+      setOnline((current?.members ?? []).slice(0, 3).map((member) => member.user));
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [boardId, queryClient]);
 
   useEffect(() => {
     if (!boardId || !socket) return;
