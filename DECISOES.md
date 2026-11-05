@@ -45,3 +45,9 @@ Decisões tomadas de forma autônoma durante o desenvolvimento, com o motivo de 
 
 28. **Pirâmide de testes**: unitários com Vitest (regras de permissão, ordenação, menções, estatísticas, tokens, services com Prisma simulado e funções de estado da web); integração com Supertest contra um PostgreSQL real (todas as rotas, incluindo erros 400/401/403/404/409/413/429 e o Socket.io); componentes com Testing Library; E2E com Playwright subindo banco, API e web.
 29. **Banco dos testes isolado e com trava**: os testes de integração só rodam em bancos cujo nome contém `test` (eles apagam as tabelas); o E2E usa o banco `fluxo_e2e` e portas próprias (3334/3101), recriando os dados com o seed a cada execução (`prisma migrate deploy` + seed, sem `migrate reset`).
+
+## Modo demonstração
+
+30. **MSW no navegador em vez de um back-end hospedado.** O GitHub Pages só serve arquivos estáticos; o build de demonstração (`NEXT_PUBLIC_DEMO=true`, `basePath` `/fluxo`) registra um Service Worker do MSW que responde às rotas da API. Os handlers reaproveitam os schemas Zod, as permissões, a ordenação e o cálculo do dashboard do pacote compartilhado, e os dados iniciais são os mesmos do seed. As alterações ficam no `localStorage` (botão "Restaurar dados" no aviso), anexos ficam só em memória (até 500 KB) e a presença "online" é simulada.
+31. **Código da demonstração fora do bundle normal.** O MSW é carregado com `import()` dinâmico apenas quando `IS_DEMO` é verdadeiro; no build do Docker esse ramo é eliminado.
+32. **Publicação a partir da `main`.** O workflow `pages.yml` roda em pushes na `main` (ou manualmente). É preciso habilitar uma vez em _Settings → Pages → Source: GitHub Actions_.
