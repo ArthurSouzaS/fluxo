@@ -15,6 +15,7 @@ export default defineConfig({
           name: 'integration',
           include: ['tests/**/*.test.ts'],
           environment: 'node',
+          globalSetup: ['tests/global-setup.ts'],
           setupFiles: ['tests/setup.ts'],
           // Os testes de integração compartilham um único banco: rodam em série.
           fileParallelism: false,
